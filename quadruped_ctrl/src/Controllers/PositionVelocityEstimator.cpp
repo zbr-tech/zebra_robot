@@ -20,7 +20,10 @@ void LinearKFPositionVelocityEstimator<T>::setup()
   // T dt = this->_stateEstimatorData.parameters->controller_dt;
   T dt = 0.002;
   ///add by shimizu
-  ros::param::get("/estimator/dt", dt);
+  float freq;
+  ros::param::get("/communication/freq", freq);
+  dt = 1 / freq;
+  ROS_INFO("estimate dt: %f", dt);
   ////
   _xhat.setZero();
   _ps.setZero();

@@ -3,7 +3,7 @@
 - ros melodic
 
 ### Install
-cd {your workspace}
+cd {your workspace}/src/
 git clone this
 
 - sudo apt-get install ros-melodic-joy

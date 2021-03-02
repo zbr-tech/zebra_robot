@@ -6,20 +6,27 @@ GaitCtrller::GaitCtrller(double freq, double *PIDParam)
   {
     ctrlParam(i) = PIDParam[i];
   }
-  //// add by shimizu
-  /////for ros param
+  ///////////// add by shimizu
+  ////for ros param
   int argc = 0;
   char *argv[1];
   ros::init(argc, argv, "rosparam");
   ros::NodeHandle nh;
-  int iterations_between_mpc, horizonLength;
-  nh.getParam("/mpc/iterations_between_mpc", iterations_between_mpc);
+  int mpc_freq;
+  int horizonLength;
+  float lowpass_T;
+  nh.getParam("/mpc/freq", mpc_freq);
   nh.getParam("/mpc/horizonLength", horizonLength);
-  //////
+  nh.getParam("/desired_state/low_pass_filter/time_constant", lowpass_T);
+  float lowpass_filter = 1 / (1 + lowpass_T * freq);
+  ROS_INFO("lowpass_filter : %f", lowpass_filter);
+  int iterations_between_mpc = static_cast<int>(freq / mpc_freq);
+  convexMPC = new ConvexMPCLocomotion(1.0 / freq, iterations_between_mpc, horizonLength, lowpass_filter);
+
+  /////////////
   _gamepadCommand.resize(4);
   FloatingBaseModel<float> _model;
   // convexMPC = new ConvexMPCLocomotion(1.0 / freq, 13);
-  convexMPC = new ConvexMPCLocomotion(1.0 / freq, iterations_between_mpc, horizonLength);
 
   _quadruped = buildMiniCheetah<float>();
   _model = _quadruped.buildModel();

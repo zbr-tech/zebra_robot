@@ -358,8 +358,8 @@ def run():
         for i in range(N_Motors):
             joint_control.position[i] = joint_pointer.contents.position[i]
             joint_control.velocity[i] = joint_pointer.contents.velocity[i]
-            joint_control.kp[i] = joint_pointer.contents.kp[i]/100
-            joint_control.kd[i] = joint_pointer.contents.kd[i]/5
+            joint_control.kp[i] = motor_kp if joint_pointer.contents.kp[i] > 0 else 0
+            joint_control.kd[i] = motor_kd if joint_pointer.contents.kd[i] > 0 else 0
             joint_control.effort[i] = joint_pointer.contents.effort[i]
         # print("t[ms]: ", (rospy.Time.now().to_nsec() - stamp_nsec) / 1000000)
     skip_count += 1
@@ -598,9 +598,13 @@ if __name__ == '__main__':
     joint_kd = rospy.get_param('/simulation/joint_kd')
 
     # add by shimizu
-    skip_num = rospy.get_param('/communication/divide')
+    communication_freq = rospy.get_param('/communication/freq')
     position_control_mode = rospy.get_param(
         '/communication/use_position_control')
+    motor_kp = rospy.get_param('/communication/kp')
+    motor_kd = rospy.get_param('/communication/kd')
+    skip_num = freq // communication_freq
+    print(skip_num)
     ###
 
     rospy.loginfo("lateralFriction = " + str(lateralFriction) +

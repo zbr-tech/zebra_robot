@@ -16,13 +16,16 @@ robot:
   joint_kd: 0.2
 ### add by shimizu
 communication:
-  divide: 1
+  freq: 100
   use_position_control: True
+  kp: 1
+  kd: 1
 mpc :
-  iterations_between_mpc: 13 ### mpc Hz = freq/(divide*this)
+  freq: 40
   horizonLength: 14
-estimator:
-  dt: 0.002 ### dt = 1/freq * divide
+desired_state:
+  low_pass_filter: 
+    time_constant: 0.2
 
 
 

@@ -96,7 +96,7 @@ class ConvexMPCLocomotion
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  ConvexMPCLocomotion(float _dt, int _iterations_between_mpc, int _horizonLength);
+  ConvexMPCLocomotion(float _dt, int _iterations_between_mpc, int _horizonLength, float _lowpass_filter);
   void initialize();
 
   template <typename T>
@@ -178,6 +178,9 @@ private:
   vectorAligned<Vec12<double>> _sparseTrajectory;
 
   SparseCMPC _sparseCMPC;
+
+  /////// add by shimizu
+  float lowpass_filter;
 };
 
 #endif //CHEETAH_SOFTWARE_CONVEXMPCLOCOMOTION_H

@@ -20,7 +20,7 @@
 // 10*30 =300ms
 ////////////////////
 
-ConvexMPCLocomotion::ConvexMPCLocomotion(float _dt, int _iterations_between_mpc, int _horizonLength)
+ConvexMPCLocomotion::ConvexMPCLocomotion(float _dt, int _iterations_between_mpc, int _horizonLength, float _lowpass_filter)
     : iterationsBetweenMPC(_iterations_between_mpc), //控制频率用  15
       horizonLength(_horizonLength),
       // horizonLength(20),
@@ -39,7 +39,8 @@ ConvexMPCLocomotion::ConvexMPCLocomotion(float _dt, int _iterations_between_mpc,
               Vec4<int>(3.0 * horizonLength / 4.0, 3.0 * horizonLength / 4.0, 3.0 * horizonLength / 4.0, 3.0 * horizonLength / 4.0), "Walking"),
       walking2(horizonLength, Vec4<int>(0, 7, 7, 0), Vec4<int>(10, 10, 10, 10), "Walking2"),
       pacing(horizonLength, Vec4<int>(7, 0, 7, 0), Vec4<int>(7, 7, 7, 7), "Pacing"),
-      aio(horizonLength, Vec4<int>(0, 0, 0, 0), Vec4<int>(14, 14, 14, 14), "aio")
+      aio(horizonLength, Vec4<int>(0, 0, 0, 0), Vec4<int>(14, 14, 14, 14), "aio"),
+      lowpass_filter(_lowpass_filter)
 {
   dtMPC = dt * iterationsBetweenMPC; // 0.03
   default_iterations_between_mpc = iterationsBetweenMPC;
@@ -87,7 +88,8 @@ void ConvexMPCLocomotion::_SetupCommand(
   _body_height = 0.25;
 
   float x_vel_cmd, y_vel_cmd, yaw_vel_cmd;
-  float x_filter(0.01), y_filter(0.006), yaw_filter(0.03);
+  // float x_filter(0.01), y_filter(0.006), yaw_filter(0.03);
+  float x_filter(lowpass_filter), y_filter(lowpass_filter), yaw_filter(lowpass_filter);
 
   //手柄数据先暂时设置为0，后面再给手柄赋值   旋转角速度和x,y方向上的线速度
   x_vel_cmd = gamepadCommand[0];
