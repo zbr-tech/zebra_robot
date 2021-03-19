@@ -15,6 +15,12 @@ robot:
   joint_kp: 10.0
   joint_kd: 0.2
 ### add by shimizu
+
+hardware_bridge:
+  freq: 100
+  use_position_control: True
+  kp: 1
+  kd: 1
 communication:
   freq: 100
   use_position_control: True

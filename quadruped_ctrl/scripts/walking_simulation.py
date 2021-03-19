@@ -586,7 +586,6 @@ def main():
 
 if __name__ == '__main__':
     rospy.init_node('quadruped_simulator', anonymous=True)
-
     terrain = rospy.get_param('/simulation/terrain')
     camera = rospy.get_param('/simulation/camera')
     lateralFriction = rospy.get_param('/simulation/lateralFriction')
