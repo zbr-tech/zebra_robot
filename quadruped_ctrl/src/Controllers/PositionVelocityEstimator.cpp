@@ -21,7 +21,7 @@ void LinearKFPositionVelocityEstimator<T>::setup()
   T dt = 0.002;
   ///add by shimizu
   float freq;
-  ros::param::get("/communication/freq", freq);
+  ros::param::get("/hardware/communication_freq", freq);
   dt = 1 / freq;
   ROS_INFO("estimate dt: %f", dt);
   ////

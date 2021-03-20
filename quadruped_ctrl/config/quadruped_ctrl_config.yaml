@@ -1,28 +1,24 @@
-simulation:
-  terrain: "plane"
-  camera: False
-  lateralFriction: 1.0
-  spinningFriction: 0.0065
-  freq: 500.0
-  stand_kp: 100.0
-  stand_kd: 1.0
-  joint_kp: 0.0
-  joint_kd: 0.05
-robot:
-  freq: 500.0
-  stand_kp: 100.0
-  stand_kd: 1.0
-  joint_kp: 10.0
-  joint_kd: 0.2
+# simulation:
+#   terrain: "plane"
+#   camera: False
+#   lateralFriction: 1.0
+#   spinningFriction: 0.0065
+#   freq: 500.0
+#   stand_kp: 100.0
+#   stand_kd: 1.0
+#   joint_kp: 0.0
+#   joint_kd: 0.05
+# robot:
+#   freq: 500.0
+#   stand_kp: 100.0
+#   stand_kd: 1.0
+#   joint_kp: 10.0
+#   joint_kd: 0.2
 ### add by shimizu
-
-hardware_bridge:
-  freq: 100
-  use_position_control: True
-  kp: 1
-  kd: 1
-communication:
-  freq: 100
+hardware:
+  use_simulator: True
+  hardware_freq: 500.0
+  communication_freq: 100
   use_position_control: True
   kp: 1
   kd: 1

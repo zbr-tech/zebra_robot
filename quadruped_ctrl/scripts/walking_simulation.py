@@ -24,6 +24,7 @@ from geometry_msgs.msg import Twist
 from quadruped_ctrl.srv import QuadrupedCmd, QuadrupedCmdResponse
 
 # add by shimizu
+import copy
 from zebra_msgs.msg import ZebraJointControl
 
 
@@ -95,6 +96,7 @@ def acc_filter(value, last_accValue):
 
 
 def pub_nav_msg(base_pos, imu_data):
+    return
     pub_odom = rospy.Publisher("/robot_odom", Odometry, queue_size=100)
     odom = Odometry()
     odom.header.stamp = rospy.Time.now()
@@ -112,6 +114,7 @@ def pub_nav_msg(base_pos, imu_data):
 
 
 def pub_imu_msg(imu_data):
+    return
     pub_imu = rospy.Publisher("/imu0", Imu, queue_size=100)
     imu_msg = Imu()
     imu_msg.linear_acceleration.x = imu_data[0]
@@ -192,6 +195,10 @@ def get_data_from_sim():
 
 
 def reset_robot():
+    for j in range(16):
+        force = 0
+        p.setJointMotorControl2(
+            boxId, j, p.VELOCITY_CONTROL, force=force)
     if terrain == "racetrack":
         robot_z = 0.4
     else:
@@ -206,21 +213,22 @@ def reset_robot():
         freq/skip_num), convert_type([stand_kp, stand_kd, joint_kp, joint_kd]))
 
     for _ in range(10):
-        p.stepSimulation()
+        # p.stepSimulation()
         imu_data, leg_data, _ = get_data_from_sim()
         cpp_gait_ctrller.pre_work(convert_type(
             imu_data), convert_type(leg_data))
 
-    for j in range(16):
-        force = 0
-        p.setJointMotorControl2(
-            boxId, j, p.VELOCITY_CONTROL, force=force)
+    # for j in range(16):
+    #     force = 0
+    #     p.setJointMotorControl2(
+        # boxId, j, p.VELOCITY_CONTROL, force=force)
 
     cpp_gait_ctrller.set_robot_mode(convert_type(1))
     for _ in range(200):
         run()
         # p.stepSimulation()
     cpp_gait_ctrller.set_robot_mode(convert_type(0))
+    print("reset robot")
 
 
 def init_simulator():
@@ -326,19 +334,20 @@ tau = []
 imu_data = 0
 leg_data = 0
 base_pos = 0
+joint_control = 0
 
 
 def run():
-    global skip_count, tau, imu_data, leg_data, base_pos
+    global skip_count, tau, imu_data, leg_data, base_pos, joint_control
     # get data from simulator
     # if skip_count%skip_num== 0:
     # print("in", skip_count)
 
     imu_data, leg_data, base_pos = get_data_from_sim()
-
+    print(imu_data)
     # pub msg
-    pub_nav_msg(base_pos, imu_data)
-    pub_imu_msg(imu_data)
+    # pub_nav_msg(base_pos, imu_data)
+    # pub_imu_msg(imu_data)
 
     # call cpp function to calculate mpc tau
     # add by shimizu
@@ -355,12 +364,21 @@ def run():
         tau = cpp_gait_ctrller.toque_calculator(convert_type(
             imu_data), convert_type(leg_data))
         joint_pointer = cpp_gait_ctrller.get_zebra_joint_control()
-        for i in range(N_Motors):
-            joint_control.position[i] = joint_pointer.contents.position[i]
-            joint_control.velocity[i] = joint_pointer.contents.velocity[i]
+
+        joint_control = copy.deepcopy(joint_pointer.contents)
+        for i in range(12):
+            # joint_control.position[i] = joint_pointer.contents.position[i]
+            # joint_control.velocity[i] = joint_pointer.contents.velocity[i]
             joint_control.kp[i] = motor_kp if joint_pointer.contents.kp[i] > 0 else 0
             joint_control.kd[i] = motor_kd if joint_pointer.contents.kd[i] > 0 else 0
-            joint_control.effort[i] = joint_pointer.contents.effort[i]
+
+        # for i in range(N_Motors):
+        #     joint_control.position[i] = joint_pointer.contents.position[i]
+        #     joint_control.velocity[i] = joint_pointer.contents.velocity[i]
+        #     joint_control.kp[i] = motor_kp if joint_pointer.contents.kp[i] > 0 else 0
+        #     joint_control.kd[i] = motor_kd if joint_pointer.contents.kd[i] > 0 else 0
+        #     joint_control.effort[i] = joint_pointer.contents.effort[i]
+
         # print("t[ms]: ", (rospy.Time.now().to_nsec() - stamp_nsec) / 1000000)
     skip_count += 1
     # pub_zebra_ctrl.publish(joint_control)
@@ -374,7 +392,8 @@ def run():
                  + joint_control.effort[i] for i in range(N_Motors)]
     # print(joint_control.velocity)
     # print(leg_data[12:])
-    # print(mcp_force[0], tau.contents.eff[0])
+    # print(leg_data, joint_control)
+    # print(mcp_force)
     # print("target")
 
     # print(mcp_force)
@@ -402,7 +421,7 @@ def run():
     # p.resetDebugVisualizerCamera(2.5, 45, -30, base_pos)
 
     p.stepSimulation()
-
+    raw_input()
     return
 
 
@@ -559,6 +578,7 @@ def main():
     reset_flag = p.readUserDebugParameter(reset)
     low_energy_flag = p.readUserDebugParameter(low_energy_mode)
     high_performance_flag = p.readUserDebugParameter(high_performance_mode)
+    print("reset_flag", reset_flag, low_energy_flag, high_performance_flag)
     while not rospy.is_shutdown():
         # check reset button state
         if(reset_flag < p.readUserDebugParameter(reset)):
