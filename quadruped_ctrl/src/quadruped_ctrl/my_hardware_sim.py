@@ -6,9 +6,10 @@ import pybullet_data
 
 
 class MyHardwareSim:
-    def init(self, freq, position_control_mode):
+    def init(self, freq, communication_freq, position_control_mode):
         self._freq = freq
         self._position_control_mode = position_control_mode
+        self._skip_num = int(freq / communication_freq)
         robot_start_pos = [0, 0, 0.42]
         p.connect(p.GUI)  # or p.DIRECT for non-graphical version
         p.setAdditionalSearchPath(pybullet_data.getDataPath())  # optionally
@@ -135,8 +136,8 @@ class MyHardwareSim:
         self._leg_data = leg_data
         return imu_data, leg_data, pose_orn[0]
 
-    def set_joint_control(self, joint_control):
-        self._joint_control = joint_control
+    # def set_joint_control(self, joint_control):
+    #     self._joint_control = joint_control
 
     def check_mode(self):
         reset = self._reset
@@ -162,27 +163,30 @@ class MyHardwareSim:
 
         return ret
 
-    def output(self):
-        leg_data = self._leg_data
+    def send(self, joint_control):
+
         boxId = self._boxId
         motor_id_list = self._motor_id_list
         N_Motors = 12
-        joint_control = self._joint_control
-        mcp_force = [joint_control.kp[i] * (joint_control.position[i] - leg_data[i])
-                     + joint_control.kd[i] *
-                     (joint_control.velocity[i] - leg_data[i+N_Motors])
-                     + joint_control.effort[i] for i in range(N_Motors)]
-        # print(leg_data, joint_control)
-        # print(mcp_force)
-        # set tau to simulator
-        if self._position_control_mode:
-            p.setJointMotorControlArray(bodyUniqueId=boxId,
-                                        jointIndices=motor_id_list,
-                                        controlMode=p.TORQUE_CONTROL,
-                                        forces=mcp_force)
-        else:  # [TODO] get tau
-            p.setJointMotorControlArray(bodyUniqueId=boxId,
-                                        jointIndices=motor_id_list,
-                                        controlMode=p.TORQUE_CONTROL,
-                                        forces=tau.contents.eff)
-        p.stepSimulation()
+        # joint_control = self._joint_control
+        for _ in range(self._skip_num):
+            self.get_data()
+            leg_data = self._leg_data
+            mcp_force = [joint_control.kp[i] * (joint_control.position[i] - leg_data[i])
+                         + joint_control.kd[i] *
+                         (joint_control.velocity[i] - leg_data[i+N_Motors])
+                         + joint_control.effort[i] for i in range(N_Motors)]
+            # print(leg_data, joint_control)
+            # print(mcp_force)
+            # set tau to simulator
+            if self._position_control_mode:
+                p.setJointMotorControlArray(bodyUniqueId=boxId,
+                                            jointIndices=motor_id_list,
+                                            controlMode=p.TORQUE_CONTROL,
+                                            forces=mcp_force)
+            else:  # [TODO] get tau
+                p.setJointMotorControlArray(bodyUniqueId=boxId,
+                                            jointIndices=motor_id_list,
+                                            controlMode=p.TORQUE_CONTROL,
+                                            forces=tau.contents.eff)
+            p.stepSimulation()

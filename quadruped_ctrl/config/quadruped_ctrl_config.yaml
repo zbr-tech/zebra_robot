@@ -18,7 +18,7 @@
 hardware:
   use_simulator: True
   hardware_freq: 500.0
-  communication_freq: 100
+  communication_freq: 100.0
   use_position_control: True
   kp: 1
   kd: 1

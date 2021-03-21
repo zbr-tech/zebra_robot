@@ -64,18 +64,19 @@ class GameManager:
         # get params
         self._hardware_freq = rospy.get_param('/hardware/hardware_freq')
         self._use_simulator = rospy.get_param('/hardware/use_simulator')
-        communication_freq = rospy.get_param('/hardware/communication_freq')
+        self._communication_freq = rospy.get_param(
+            '/hardware/communication_freq')
         position_control_mode = rospy.get_param(
             '/hardware/use_position_control')
         self._motor_kp = rospy.get_param('/hardware/kp')
         self._motor_kd = rospy.get_param('/hardware/kd')
-        self._skip_num = self._hardware_freq // communication_freq
         ###
 
         self._cpp_gait_ctrller = self.make_cpp_gait_ctrller()
         if self._use_simulator:
             self._hardware = MyHardwareSim()
-            self._hardware.init(self._hardware_freq, position_control_mode)
+            self._hardware.init(self._hardware_freq, self._communication_freq,
+                                position_control_mode)
         else:
             self._hardware = MyHardwareBridge()
         self.reset_robot()
@@ -106,15 +107,14 @@ class GameManager:
         imu_data, leg_data, base_pos = self._hardware.get_data()
         # print(imu_data)
         # raw_input()
-        if self._skip_count % self._skip_num == 0:
-            # stamp_nsec = rospy.Time.now().to_nsec()
-            joint_control = self.cal_output(imu_data, leg_data)
-            self._hardware.set_joint_control(joint_control)
-            # print("t[ms]: ", (rospy.Time.now().to_nsec() - stamp_nsec) / 1000000)
-        self._skip_count += 1
+        # if self._skip_count % self._skip_num == 0:
+        # stamp_nsec = rospy.Time.now().to_nsec()
+        joint_control = self.cal_output(imu_data, leg_data)
+        # self._hardware.set_joint_control(joint_control)
+        # print("t[ms]: ", (rospy.Time.now().to_nsec() - stamp_nsec) / 1000000)
         if self._use_simulator:
             self.safty_check()
-        self._hardware.output()
+        self._hardware.send(joint_control)
 
     def safty_check(self):
         check = self._hardware.check_mode()
@@ -126,29 +126,23 @@ class GameManager:
             self._cpp_gait_ctrller.set_robot_mode(convert_type(0))
 
     def reset_robot(self):
-        self._skip_count = 0
+        # self._skip_count = 0
         self._hardware.reset_robot()
         # if self._use_simulator:
         stand_kp, stand_kd, joint_kp, joint_kd = 100.0, 1.0, 0.0, 0.05
         self._cpp_gait_ctrller.init_controller(convert_type(
-            self._hardware_freq/self._skip_num), convert_type([stand_kp, stand_kd, joint_kp, joint_kd]))
-
+            self._communication_freq), convert_type([stand_kp, stand_kd, joint_kp, joint_kd]))
         for _ in range(10):
-            # p.stepSimulation()
-            # self._hardware.output()
             imu_data, leg_data, _ = self._hardware.get_data()
             self._cpp_gait_ctrller.pre_work(convert_type(
                 imu_data), convert_type(leg_data))
-
-        self._cpp_gait_ctrller.set_robot_mode(convert_type(1))
-        for _ in range(200):
-            self.run_one_step()
-            # p.stepSimulation()
+        # self._cpp_gait_ctrller.set_robot_mode(convert_type(1))
+        # for _ in range(200):
+        #     self.run_one_step()
         self._cpp_gait_ctrller.set_robot_mode(convert_type(0))
-        rospy.logwarn("reset the robot")
 
     def main(self):
-        rate = rospy.Rate(self._hardware_freq)  # hz
+        rate = rospy.Rate(self._communication_freq)  # hz
         while not rospy.is_shutdown():
             self.run_one_step()
             rate.sleep()
