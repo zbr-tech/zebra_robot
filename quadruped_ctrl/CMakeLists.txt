@@ -157,9 +157,9 @@ target_link_libraries(${PROJECT_NAME}
   osqp
 )
 
-# add_executable(mainController src/mainController.cpp)
-# target_link_libraries(mainController ${catkin_LIBRARIES} ${PROJECT_NAME})
-# add_dependencies(mainController ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_executable(cansend src/CAN/cansend.c)
+# target_link_libraries(cansend ${catkin_LIBRARIES} ${PROJECT_NAME})
+# add_dependencies(cansend ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

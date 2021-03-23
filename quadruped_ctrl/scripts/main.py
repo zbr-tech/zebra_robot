@@ -24,18 +24,8 @@ from quadruped_ctrl.srv import QuadrupedCmd, QuadrupedCmdResponse
 # add by shimizu
 # from zebra_msgs.msg import ZebraJointControl
 from quadruped_ctrl.ctype_utils import StructPointer, ZebraPointer, convert_type
-from quadruped_ctrl.my_hardware_sim import MyHardwareSim
-
-
-class MyHardwareBridge:
-    def init(self):
-        pass
-
-    def reset_robot(self):
-        pass
-
-    def get_data(self):
-        pass
+from quadruped_ctrl.myhardware_sim import MyHardwareSim
+from quadruped_ctrl.myhardware_bridge import MyHardwareBridge
 
 
 class GameManager:
@@ -103,18 +93,18 @@ class GameManager:
             joint_control.kd[i] = self._motor_kd if joint_pointer.contents.kd[i] > 0 else 0
         return joint_control
 
-    def run_one_step(self):
-        imu_data, leg_data, base_pos = self._hardware.get_data()
-        # print(imu_data)
-        # raw_input()
-        # if self._skip_count % self._skip_num == 0:
-        # stamp_nsec = rospy.Time.now().to_nsec()
-        joint_control = self.cal_output(imu_data, leg_data)
-        # self._hardware.set_joint_control(joint_control)
-        # print("t[ms]: ", (rospy.Time.now().to_nsec() - stamp_nsec) / 1000000)
-        if self._use_simulator:
-            self.safty_check()
-        self._hardware.send(joint_control)
+    # def run_one_step(self):
+    #     imu_data, leg_data, base_pos = self._hardware.get_data()
+    #     # print(imu_data)
+    #     # raw_input()
+    #     # if self._skip_count % self._skip_num == 0:
+    #     # stamp_nsec = rospy.Time.now().to_nsec()
+    #     joint_control = self.cal_output(imu_data, leg_data)
+    #     # self._hardware.set_joint_control(joint_control)
+    #     # print("t[ms]: ", (rospy.Time.now().to_nsec() - stamp_nsec) / 1000000)
+    #     if self._use_simulator:
+    #         self.safty_check()
+    #     self._hardware.send(joint_control)
 
     def safty_check(self):
         check = self._hardware.check_mode()
@@ -144,7 +134,11 @@ class GameManager:
     def main(self):
         rate = rospy.Rate(self._communication_freq)  # hz
         while not rospy.is_shutdown():
-            self.run_one_step()
+            imu_data, leg_data, base_pos = self._hardware.get_data()
+            joint_control = self.cal_output(imu_data, leg_data)
+            if self._use_simulator:
+                self.safty_check()
+            self._hardware.send(joint_control)
             rate.sleep()
 
     def thread_job(self):

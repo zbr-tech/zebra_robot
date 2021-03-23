@@ -6,11 +6,14 @@
 cd {your workspace}/src/
 git clone this
 
+- Please rewrite eigen path in quadruped_ctrl/Cmakelist.txt
 - sudo apt-get install ros-melodic-joy
 - sudo apt-get install ros-melodic-joystick-drivers
 - pip install pyquaternion pcl pybullet
 - pip install numpy --upgrade
-- Please rewrite eigen path in quadruped_ctrl/Cmakelist.txt
+- sudo apt-get install can-utils # for CAN connection
+- sudo pip install python-can
+
 
 ### Terrain
 you can modify the ```config/quadruped_ctrl_cinfig.yaml/terrain``` to deploy different terrains, there are four terrains supported in the simulator now, for example:

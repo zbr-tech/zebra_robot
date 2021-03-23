@@ -190,3 +190,6 @@ class MyHardwareSim:
                                             controlMode=p.TORQUE_CONTROL,
                                             forces=tau.contents.eff)
             p.stepSimulation()
+
+    def __del__(self):
+        p.disconnect()
