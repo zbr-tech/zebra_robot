@@ -1,31 +1,26 @@
 ### Environment
 - ubuntu 18.04 LTS
 - ros melodic
+- python 2.7.17
 
 ### Install
-cd {your workspace}/src/
-git clone this
-
+- git clone this in {your workspace}/src/  
 - Please rewrite eigen path in quadruped_ctrl/Cmakelist.txt
 - sudo apt-get install ros-melodic-joy
 - sudo apt-get install ros-melodic-joystick-drivers
 - pip install pyquaternion pcl pybullet
 - pip install numpy --upgrade
-- sudo apt-get install can-utils # for CAN connection
-- sudo pip install python-can
+- sudo apt-get install can-utils
+- pip install pyserial
 
-
-### Terrain
-you can modify the ```config/quadruped_ctrl_cinfig.yaml/terrain``` to deploy different terrains, there are four terrains supported in the simulator now, for example:
-```
-"plane"
-"stairs"
-"random1"
-"random2"
-"racetrack"
-```
 
 ### Running:
+- Please see params in quadruped_ctrl/config
+- sudo chmod 666 /dev/ttyACM0
+- roslaunch quadruped_ctrl quadruped_ctrl.launch
+- roslaunch gamepad_ctrl gamepad_ctrl.launch
+
+### Memo
 run the gamepad node to control robot:
 ```
 roslaunch gamepad_ctrl gamepad_ctrl.launch
@@ -62,3 +57,13 @@ gait type:
 11:walking2
 ```
 
+
+### Terrain
+you can modify the ```config/quadruped_ctrl_cinfig.yaml/terrain``` to deploy different terrains, there are four terrains supported in the simulator now, for example:
+```
+"plane"
+"stairs"
+"random1"
+"random2"
+"racetrack"
+```
