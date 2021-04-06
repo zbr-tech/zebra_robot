@@ -25,7 +25,7 @@ class MyHardwareBridge(MyHardwareBase):
 
     def communicate(self, joint_control):
         for i in range(12):
-            id = i  # + 1
+            id = i + 1
             p_des = joint_control.position[i]  # * self.GR
             v_des = joint_control.velocity[i]  # * self.GR
             kp = joint_control.kp[i]
