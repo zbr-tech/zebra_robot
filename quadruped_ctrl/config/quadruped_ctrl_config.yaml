@@ -16,7 +16,7 @@
 #   joint_kd: 0.2
 ### add by shimizu
 hardware:
-  hardware_bridge_mode: "simulator"  # mode : simulator, dual 
+  hardware_bridge_mode: "dual"  # mode : simulator, dual 
   hardware_freq: 500.0
   communication_freq: 100.0
   use_position_control: True

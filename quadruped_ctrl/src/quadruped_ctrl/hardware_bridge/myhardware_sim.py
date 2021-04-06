@@ -228,7 +228,7 @@ class MyHardwareSim(MyHardwareBase):
 
         return ret
 
-    def send(self, joint_control):
+    def communicate(self, joint_control):
 
         boxId = self._boxId
         motor_id_list = self._motor_id_list

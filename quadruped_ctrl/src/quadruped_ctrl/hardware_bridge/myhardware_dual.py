@@ -1,22 +1,20 @@
 #!/usr/bin/python
-from quadruped_ctrl.hardware_bridge.myhardware_bridge_serial import (
-    MyHardwareBridgeSerial,
-)
+from quadruped_ctrl.hardware_bridge.myhardware_bridge import MyHardwareBridge
 from quadruped_ctrl.hardware_bridge.myhardware_sim import MyHardwareSim
 
 
 class MyHardwareDual:
     def __init__(self, sim_freq, communication_freq, position_control_mode):
         self._sim = MyHardwareSim(sim_freq, communication_freq, position_control_mode)
-        self._serial = MyHardwareBridgeSerial(communication_freq)
+        self._serial = MyHardwareBridge(communication_freq, ["can0"], "can")
 
     def reset_robot(self):
         self._sim.reset_robot()
         self._serial.reset_robot()
 
-    def send(self, joint_control):
-        self._sim.send(joint_control)
-        self._serial.send(joint_control)
+    def communicate(self, joint_control):
+        self._sim.communicate(joint_control)
+        self._serial.communicate(joint_control)
 
     def get_data(self):
         ret_sim = self._sim.get_data()

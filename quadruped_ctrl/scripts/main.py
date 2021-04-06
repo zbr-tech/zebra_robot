@@ -81,19 +81,6 @@ class GameManager:
             )
         return joint_control
 
-    # def run_one_step(self):
-    #     imu_data, leg_data, base_pos = self._hardware.get_data()
-    #     # print(imu_data)
-    #     # raw_input()
-    #     # if self._skip_count % self._skip_num == 0:
-    #     # stamp_nsec = rospy.Time.now().to_nsec()
-    #     joint_control = self.cal_output(imu_data, leg_data)
-    #     # self._hardware.set_joint_control(joint_control)
-    #     # print("t[ms]: ", (rospy.Time.now().to_nsec() - stamp_nsec) / 1000000)
-    #     if self._use_simulator:
-    #         self.safty_check()
-    #     self._hardware.send(joint_control)
-
     def safty_check(self):
         check = self._hardware.check_mode()
         if check is None:
@@ -130,7 +117,7 @@ class GameManager:
             imu_data, leg_data = self._hardware.get_data()
             joint_control = self.cal_output(imu_data, leg_data)
             self.safty_check()  # [TODO] not need if use simulator
-            self._hardware.send(joint_control)
+            self._hardware.communicate(joint_control)
             rate.sleep()
 
     def thread_job(self):

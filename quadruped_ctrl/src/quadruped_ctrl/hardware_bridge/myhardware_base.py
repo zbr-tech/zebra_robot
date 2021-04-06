@@ -2,7 +2,7 @@
 
 
 class MyHardwareBase:
-    def send(self, joint_control):
+    def communicate(self, joint_control):
         pass
 
     def get_data(self):

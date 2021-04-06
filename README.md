@@ -10,15 +10,22 @@
 - sudo apt-get install ros-melodic-joystick-drivers
 - pip install pyquaternion pcl pybullet
 - pip install numpy --upgrade
-- sudo apt-get install can-utils
-- pip install pyserial
+- sudo apt-get install can-utils 
+- pip install python-can 
+- pip install pyserial 
 
-
-### Running:
+### Running
 - Please see params in quadruped_ctrl/config
 - sudo chmod 666 /dev/ttyACM0
 - roslaunch quadruped_ctrl quadruped_ctrl.launch
 - roslaunch gamepad_ctrl gamepad_ctrl.launch
+
+### Reference
+- https://python-can.readthedocs.io/en/2.1.0/installation.html
+- https://github.com/INNO-MAKER/usb2can
+- https://python-can.readthedocs.io/en/2.1.0/installation.html
+- https://os.mbed.com/users/benkatz/code/CanMaster/
+
 
 ### Memo
 run the gamepad node to control robot:
