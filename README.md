@@ -14,6 +14,12 @@
 - pip install python-can 
 - pip install pyserial 
 
+### Warning
+#### Memo for real robot
+- Please set each motor's CAN ID as 0~12 (you should use serial setting command )
+- Please set CAN-CAN mbed's CAN ID as 13~ (you should change program of mbed IDE)
+
+
 ### Running
 - Please see params in quadruped_ctrl/config
 - sudo chmod 666 /dev/ttyACM0
@@ -25,6 +31,8 @@
 - https://github.com/INNO-MAKER/usb2can
 - https://python-can.readthedocs.io/en/2.1.0/installation.html
 - https://os.mbed.com/users/benkatz/code/CanMaster/
+
+
 
 
 ### Memo

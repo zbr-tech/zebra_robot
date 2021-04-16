@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import can
 
 
@@ -23,6 +24,8 @@ def uint_to_float(x_int, x_min, x_max, bits):
 
 class MotorCan:
     def __init__(self, port, timeout):
+        os.system("sudo ip link set {} type can bitrate 1000000".format(port))
+        os.system("sudo ifconfig {} up".format(port))
         self._can0 = can.interface.Bus(channel=port, bustype="socketcan_ctypes")
         # try:
         print("connected " + port)
