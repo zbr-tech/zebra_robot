@@ -5,6 +5,7 @@ project(quadruped_ctrl)
 #add_compile_options(-std=c++11)
 
 set(CMAKE_BUILD_TYPE "Release")
+#set (CMAKE_CXX_STANDARD 14)
 #set(BUILD_TYPE_RELEASE True)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)

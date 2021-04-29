@@ -1,7 +1,8 @@
 ### Environment
-- ubuntu 18.04 LTS
+- ubuntu 18.04 LTS (Cannot use ubuntu 16.04)
 - ros melodic
 - python 2.7.17
+
 
 ### Install
 - git clone this in {your workspace}/src/  

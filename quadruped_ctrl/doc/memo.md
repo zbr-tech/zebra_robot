@@ -19,8 +19,11 @@ MPC_Ctrl/ConvexMPCLocomotion.cppでインスタンスを作成している。def
 足先軌道：
 - Control/FootSwingTrajectoryを使って計算
 - 足上げ高さのパラメータ：MPC_Ctrl/ConvexMPCLocomotion.cppの290行目
-MPCに関するパラメータ
-- DesiredStateCommand : 使用されていない
+- MPCに関するパラメータ
+    -  DesiredStateCommand : 使用されていない
+- 安全チェックに関するパラメータ
+    - src/Controllers/SafetyChecker.cpp に直書き
+
 
 ### Others
 - solveMPC.cpp/q_soln：目標反力（world座標系）
