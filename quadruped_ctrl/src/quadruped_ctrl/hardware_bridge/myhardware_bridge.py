@@ -14,12 +14,17 @@ class MyHardwareBridge(MyHardwareBase):
         self._leg_data = [0] * 2 * self.MOTOR_NUM
         self._imu_data = [0] * 10
         self._motor_modules = []
+
         timeout = 1.0 / communication_freq / self.MOTOR_NUM
         if interface == "serial":
             self._motor_modules = [MotorSerial(port, timeout) for port in ports]
         elif interface == "can":
             for port in ports:
-                self._motor_modules.append(MotorCan(port, timeout))
+                try:
+                    self._motor_modules.append(MotorCan(port, timeout))
+                    rospy.loginfo("Connected to port " + port)
+                except:
+                    rospy.logerr("Port "+ port + " not found")
 
     def communicate(self, joint_control):
         for i in range(12):
