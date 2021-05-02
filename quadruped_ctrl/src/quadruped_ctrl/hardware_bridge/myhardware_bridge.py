@@ -11,7 +11,7 @@ class MyHardwareBridge(MyHardwareBase):
         self.LEGPERMODULE = 12  # [TODO]
         self.MOTOR_NUM = 12
         self.GR = 6
-        self._leg_data = [0] * 2 * self.MOTOR_NUM
+        self._leg_data = [0] * 3 * self.MOTOR_NUM
         self._imu_data = [0] * 10
         self._motor_modules = []
 
@@ -33,24 +33,40 @@ class MyHardwareBridge(MyHardwareBase):
             v_des = joint_control.velocity[i] / self.GR  * self.GR
             kp = joint_control.kp[i]
             kd = joint_control.kd[i]
-            i_ff = joint_control.effort[i] / self.GR
+            i_ff = joint_control.effort[i] / self.GR * self.GR
 
             module_id = i // self.LEGPERMODULE
             self._motor_modules[module_id].send_command(id, p_des, v_des, kp, kd, i_ff)
             ret = self._motor_modules[module_id].receive()
             if ret is not None:
-                id, posi, vel, _ = ret
+                id, posi, vel,current= ret
                 i = id - 1
                 if i < self.MOTOR_NUM:
                     self._leg_data[i] = posi * self.GR  / self.GR
-                    self._leg_data[i + self.MOTOR_NUM] = vel * self.GR  / self.GR
+                    self._leg_data[i + self.MOTOR_NUM * 1] = vel * self.GR  / self.GR
+                    self._leg_data[i + self.MOTOR_NUM * 2] = current
+            else:
+                #rospy.logerr("Joint " + str(i) + " not connected")
+                pass
 
     def reset_robot(self):
         for i in range(self.MOTOR_NUM):
             module_id = i // self.LEGPERMODULE
             self._motor_modules[module_id].enable_motor(i + 1)
             self._motor_modules[module_id].zero_position(i + 1)
-        print("reset")
+        rospy.loginfo("Reset")
+
+    def enable_all_joints(self):
+        for i in range(self.MOTOR_NUM):
+            module_id = i // self.LEGPERMODULE
+            self._motor_modules[module_id].enable_motor(i + 1)
+        rospy.loginfo("Enable all joints")
+
+    def disable_all_joints(self):
+        for i in range(self.MOTOR_NUM):
+            module_id = i // self.LEGPERMODULE
+            self._motor_modules[module_id].disable_motor(i + 1)
+        rospy.loginfo("Disable all joints")
 
     def get_data(self):
         return self._imu_data, self._leg_data

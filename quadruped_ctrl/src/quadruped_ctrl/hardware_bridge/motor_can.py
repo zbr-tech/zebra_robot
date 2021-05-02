@@ -28,7 +28,6 @@ class MotorCan:
         os.system("sudo ifconfig {} up".format(port))
         self._can0 = can.interface.Bus(channel=port, bustype="socketcan_ctypes")
         # try:
-        print("connected " + port)
         self._timeout = timeout
         self.P_MIN = -95.5
         self.P_MAX = 95.5

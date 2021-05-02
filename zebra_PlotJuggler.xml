@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root version="2.3.8">
+ <tabbed_widget parent="main_window" name="Main Window">
+  <Tab tab_name="Front Left Legs" containers="1">
+   <Container>
+    <DockSplitter sizes="1" orientation="-" count="1">
+     <DockSplitter sizes="0.333454;0.333092;0.333454" orientation="|" count="3">
+      <DockSplitter sizes="0.333333;0.333333;0.333333" orientation="-" count="3">
+       <DockArea name="...">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="14.398744" top="-0.431891" left="9.399319" bottom="-0.631891"/>
+         <limitY/>
+         <curve color="#1ac938" name="/joint_states/front_left_leg/joint1/position"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="14.398744" top="2.902198" left="9.399319" bottom="2.702198"/>
+         <limitY/>
+         <curve color="#ff7f0e" name="/joint_states/front_left_leg/joint1/velocity"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="14.398744" top="0.271429" left="9.399319" bottom="0.071429"/>
+         <limitY/>
+         <curve color="#d62728" name="/joint_states/front_left_leg/joint1/effort"/>
+        </plot>
+       </DockArea>
+      </DockSplitter>
+      <DockSplitter sizes="0.333333;0.333333;0.333333" orientation="-" count="3">
+       <DockArea name="...">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="14.398744" top="0.089799" left="9.399319" bottom="-0.110201"/>
+         <limitY/>
+         <curve color="#1f77b4" name="/joint_states/front_left_leg/joint2/position"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="14.398744" top="0.089011" left="9.399319" bottom="-0.110989"/>
+         <limitY/>
+         <curve color="#f14cc1" name="/joint_states/front_left_leg/joint2/velocity"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="14.398744" top="0.165934" left="9.399319" bottom="-0.034066"/>
+         <limitY/>
+         <curve color="#9467bd" name="/joint_states/front_left_leg/joint2/effort"/>
+        </plot>
+       </DockArea>
+      </DockSplitter>
+      <DockSplitter sizes="0.333333;0.333333;0.333333" orientation="-" count="3">
+       <DockArea name="...">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="14.398744" top="0.100000" left="9.399319" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#1ac938" name="/joint_states/front_left_leg/joint3/position"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="14.398744" top="0.100000" left="9.399319" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#ff7f0e" name="/joint_states/front_left_leg/joint3/velocity"/>
+        </plot>
+       </DockArea>
+       <DockArea name="...">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="14.398744" top="0.100000" left="9.399319" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#d62728" name="/joint_states/front_left_leg/joint3/effort"/>
+        </plot>
+       </DockArea>
+      </DockSplitter>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <Tab tab_name="Front Right Legs" containers="1">
+   <Container>
+    <DockSplitter sizes="1" orientation="-" count="1">
+     <DockSplitter sizes="0.333092;0.333816;0.333092" orientation="|" count="3">
+      <DockSplitter sizes="0.333333;0.333333;0.333333" orientation="-" count="3">
+       <DockArea name="Joint1 Position">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="6.799476" top="0.100000" left="1.799860" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#d62728" name="/joint_states/front_right_leg/joint1/position"/>
+        </plot>
+       </DockArea>
+       <DockArea name="Joint1 Velocity">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="6.799476" top="0.100000" left="1.799860" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#1ac938" name="/joint_states/front_right_leg/joint1/velocity"/>
+        </plot>
+       </DockArea>
+       <DockArea name="Joint1 Effort">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="6.799476" top="0.100000" left="1.799860" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#1f77b4" name="/joint_states/front_right_leg/joint1/effort"/>
+        </plot>
+       </DockArea>
+      </DockSplitter>
+      <DockSplitter sizes="0.333333;0.333333;0.333333" orientation="-" count="3">
+       <DockArea name="Joint2 Position">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="6.799476" top="0.100000" left="1.799860" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#f14cc1" name="/joint_states/front_right_leg/joint2/position"/>
+        </plot>
+       </DockArea>
+       <DockArea name="Joint2 Velocity">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="6.799476" top="0.100000" left="1.799860" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#9467bd" name="/joint_states/front_right_leg/joint2/velocity"/>
+        </plot>
+       </DockArea>
+       <DockArea name="Joint2 Effort">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="6.799476" top="0.100000" left="1.799860" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#ff7f0e" name="/joint_states/front_right_leg/joint2/effort"/>
+        </plot>
+       </DockArea>
+      </DockSplitter>
+      <DockSplitter sizes="0.333333;0.333333;0.333333" orientation="-" count="3">
+       <DockArea name="Joint3 Position">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="6.799476" top="0.100000" left="1.799860" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#bcbd22" name="/joint_states/front_right_leg/joint3/position"/>
+        </plot>
+       </DockArea>
+       <DockArea name="Joint3 Velocity">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="6.799476" top="0.100000" left="1.799860" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#1f77b4" name="/joint_states/front_right_leg/joint3/velocity"/>
+        </plot>
+       </DockArea>
+       <DockArea name="Joint3 Effort">
+        <plot mode="TimeSeries" style="Lines">
+         <range right="6.799476" top="0.100000" left="1.799860" bottom="-0.100000"/>
+         <limitY/>
+         <curve color="#17becf" name="/joint_states/front_right_leg/joint3/effort"/>
+        </plot>
+       </DockArea>
+      </DockSplitter>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <currentTabIndex index="0"/>
+ </tabbed_widget>
+ <use_relative_time_offset enabled="1"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <!-- - - - - - - - - - - - - - - -->
+ <Plugins>
+  <plugin ID="DataLoad CSV">
+   <default time_axis=""/>
+  </plugin>
+  <plugin ID="DataLoad ROS bags">
+   <use_header_stamp value="false"/>
+   <use_renaming_rules value="true"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+  </plugin>
+  <plugin ID="DataLoad ULog"/>
+  <plugin ID="LSL Subscriber"/>
+  <plugin ID="MQTT Subscriber"/>
+  <plugin ID="ROS Topic Subscriber">
+   <use_header_stamp value="false"/>
+   <use_renaming_rules value="true"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+  </plugin>
+  <plugin ID="UDP Server"/>
+  <plugin ID="WebSocket Server"/>
+  <plugin ID="ZMQ Subscriber"/>
+  <plugin status="idle" ID="ROS /rosout Visualization"/>
+  <plugin status="idle" ID="ROS Topic Re-Publisher"/>
+ </Plugins>
+ <!-- - - - - - - - - - - - - - - -->
+ <previouslyLoaded_Datafiles/>
+ <previouslyLoaded_Streamer name="ROS Topic Subscriber"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <customMathEquations/>
+ <snippets/>
+ <!-- - - - - - - - - - - - - - - -->
+</root>
+
