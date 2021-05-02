@@ -1,0 +1,14 @@
+<launch>
+<!-- arguments -->
+<arg name="model" default="$(find zebra_description)/robots/zebra.urdf.xacro"/>
+<arg name="gui" default="False" />
+<!-- prameters -->
+<param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)"/>
+<param name="use_gui" value="$(arg gui)"/>
+<rosparam param="source_list">["joint_states"]</rosparam>
+<!-- nodes -->
+<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+<!-- rviz -->
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find zebra_description)/config/zebra_display.rviz" required="true"/>
+</launch>

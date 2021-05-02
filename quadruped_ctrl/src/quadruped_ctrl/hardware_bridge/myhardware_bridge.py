@@ -29,8 +29,8 @@ class MyHardwareBridge(MyHardwareBase):
     def communicate(self, joint_control):
         for i in range(12):
             id = i + 1
-            p_des = joint_control.position[i] / self.GR  # * self.GR
-            v_des = joint_control.velocity[i] / self.GR  # * self.GR
+            p_des = joint_control.position[i] / self.GR  * self.GR
+            v_des = joint_control.velocity[i] / self.GR  * self.GR
             kp = joint_control.kp[i]
             kd = joint_control.kd[i]
             i_ff = joint_control.effort[i] / self.GR
@@ -42,8 +42,8 @@ class MyHardwareBridge(MyHardwareBase):
                 id, posi, vel, _ = ret
                 i = id - 1
                 if i < self.MOTOR_NUM:
-                    self._leg_data[i] = posi * self.GR  # / self.GR
-                    self._leg_data[i + self.MOTOR_NUM] = vel * self.GR  # / self.GR
+                    self._leg_data[i] = posi * self.GR  / self.GR
+                    self._leg_data[i + self.MOTOR_NUM] = vel * self.GR  / self.GR
 
     def reset_robot(self):
         for i in range(self.MOTOR_NUM):

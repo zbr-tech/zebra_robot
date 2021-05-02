@@ -10,7 +10,7 @@ class test:
     def __init__(self):
         rospy.init_node("trajectory_controller")
         self._joint_control_publisher = rospy.Publisher('joint_control', ZebraJointControl, queue_size=100)
-        self._joint_state_publisher = rospy.Publisher('joint_state', JointState, queue_size=100)
+        self._joint_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=100)
         self._communication_freq = 100
         self._hardware = MyHardwareBridge(self._communication_freq, ["can0"], "can")
         joint_control = ZebraJointControl()
@@ -21,7 +21,10 @@ class test:
         joint_control.effort = [0] * 12
 
         joint_state = JointState()
-        joint_state.name = ["front_left_leg/joint1"] * 12 #[TODO]Write all joint names
+        joint_state.name = ["front_right_leg/joint1","front_right_leg/joint2","front_right_leg/joint3",
+                            "front_left_leg/joint1","front_left_leg/joint2","front_left_leg/joint3",
+                            "hind_left_leg/joint1","hind_left_leg/joint2","hind_left_leg/joint3",
+                            "hind_right_leg/joint1","hind_right_leg/joint2","hind_right_leg/joint3"]
         joint_state.position = [0] * 12
         joint_state.velocity = [0] * 12
         joint_state.effort = [0] * 12
@@ -32,15 +35,15 @@ class test:
         self._joint_control = joint_control
         self._joint_state = joint_state
 
-        self._hardware.reset_robot()
+        #self._hardware.reset_robot()
         rospy.Timer(rospy.Duration(1.0 / self._communication_freq), self.controlCallback)
         rospy.spin()
 
     def controlCallback(self, event):
 
-        loop_period = 2 # cosine wave period (sec)
-        joint_limit_max = math.pi * 6 # max limit of jonit (rad)
-        joint_limit_min = math.pi * -6 # min limit of jonit (rad)
+        loop_period = 5 # cosine wave period (sec)
+        joint_limit_max = math.pi * 1 # max limit of jonit (rad)
+        joint_limit_min = math.pi * -1 # min limit of jonit (rad)
         
         self._hardware.communicate(self._joint_control) # send data
         imu, leg = self._hardware.get_data()            # receive data
@@ -65,7 +68,6 @@ class test:
             if self._count > self._communication_freq * loop_period / 2:
                 self._joint_limit_min = joint_limit_min
             self._joint_control.position[4] = (joint_limit_max - self._joint_limit_min) / 2.0 * math.cos(2 * math.pi *(self._count / float(self._communication_freq *loop_period)) + math.pi) +(joint_limit_max + self._joint_limit_min) / 2.0
-            print(leg[4])
 
 if __name__ == "__main__":
     test()

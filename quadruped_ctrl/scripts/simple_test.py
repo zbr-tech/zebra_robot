@@ -13,25 +13,25 @@ class test:
         joint_control = ZebraJointControl()
         joint_control.position = [0] * 12
         joint_control.velocity = [0] * 12
-        joint_control.kp = [1] * 12
+        joint_control.kp = [5] * 12
         joint_control.kd = [0] * 12
         joint_control.effort = [0] * 12
         self._joint_control = joint_control
-        self._add = 0.01
+        self._add = 0.1
         self._hardware.reset_robot()
         rospy.Timer(rospy.Duration(1.0 / communication_freq), self.controlCallback)
         rospy.spin()
 
     def controlCallback(self, event):
-        target = self._joint_control.position[0]
+        target = self._joint_control.position[4]
         target += self._add
         if target > 12 or target < 0:
             self._add *= -1
-        self._joint_control.position[0] = target
+        self._joint_control.position[4] = target
         self._hardware.communicate(self._joint_control)
         imu, leg = self._hardware.get_data()
-        print("des: ", self._joint_control.position[0])
-        print("ret: ", leg[0])
+        print("des: ", self._joint_control.position[4])
+        print("ret: ", leg[4])
 
 
 if __name__ == "__main__":

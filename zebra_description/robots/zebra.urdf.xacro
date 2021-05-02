@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<robot name="zebra" xmlns:xacro="http://ros.org/wiki/xacro">
+  
+  <!-- Joint Limits -->
+  <xacro:property name="joint_effort_limit" value="17"/>
+  <xacro:property name="joint_velocity_limit" value="10"/>
+
+  <!-- Dependencies -->
+  <xacro:include filename="$(find zebra_description)/urdf/materials.xacro"/>
+  <xacro:include filename="$(find zebra_description)/urdf/common.xacro"/>
+  <xacro:include filename="$(find zebra_description)/urdf/base/base.urdf.xacro"/>
+  <xacro:include filename="$(find zebra_description)/urdf/leg/leg_type_a.urdf.xacro"/>
+  <xacro:include filename="$(find zebra_description)/urdf/leg/leg_type_b.urdf.xacro"/>
+
+  <!-- Link & Joint -->
+  <link name="world"/>
+
+  <xacro:base parent="world">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:base>
+
+  <xacro:leg_type_a prefix="front_left_" parent="base/front_left_link_tip">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:leg_type_a>
+
+  <xacro:leg_type_b prefix="front_right_" parent="base/front_right_link_tip">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:leg_type_b>
+  
+  <xacro:leg_type_b prefix="hind_left_" parent="base/hind_left_link_tip">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:leg_type_b>
+
+  <xacro:leg_type_a prefix="hind_right_" parent="base/hind_right_link_tip">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:leg_type_a>
+
+</robot>

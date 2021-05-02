@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Constants -->
+  <xacro:property name="visual_mesh_scale" value="1.0 1.0 1.0"/>
+  <xacro:property name="collision_mesh_scale" value="1.0 1.0 1.0"/>
+
+  <xacro:property name="leg_root_position_x" value="0.075"/>
+  <xacro:property name="leg_root_position_y" value="0.056"/>
+
+  <!-- Link & Joint -->
+  <xacro:macro name="base" params="parent *joint_origin">
+  
+    <joint name="base/root" type="fixed">
+      <xacro:insert_block name="joint_origin"/>
+      <parent link="${parent}"/>
+      <child link="base/base_link"/>
+    </joint>
+
+    <link name="base/base_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://zebra_description/meshes/base/base.stl" scale="${visual_mesh_scale}"/>
+        </geometry>
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="package://zebra_description/meshes/base/base.stl" scale="${visual_mesh_scale}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="base/front_left_joint_tip" type="fixed">
+      <parent link="base/base_link"/>
+      <child link="base/front_left_link_tip"/>
+      <origin xyz="${leg_root_position_x} ${leg_root_position_y} 0" rpy="0 0 0"/>
+    </joint>
+    <link name="base/front_left_link_tip"/>
+
+    <joint name="base/front_right_joint_tip" type="fixed">
+      <parent link="base/base_link"/>
+      <child link="base/front_right_link_tip"/>
+      <origin xyz="${leg_root_position_x} -${leg_root_position_y} 0" rpy="0 0 0"/>
+    </joint>
+    <link name="base/front_right_link_tip"/>
+
+    <joint name="base/hind_left_joint_tip" type="fixed">
+      <parent link="base/base_link"/>
+      <child link="base/hind_left_link_tip"/>
+      <origin xyz="-${leg_root_position_x} ${leg_root_position_y} 0" rpy="0 0 ${180*M_PI/180}"/>
+    </joint>
+    <link name="base/hind_left_link_tip"/>
+
+    <joint name="base/hind_right_joint_tip" type="fixed">
+      <parent link="base/base_link"/>
+      <child link="base/hind_right_link_tip"/>
+      <origin xyz="-${leg_root_position_x} -${leg_root_position_y} 0" rpy="0 0 ${180*M_PI/180}"/>
+    </joint>
+    <link name="base/hind_right_link_tip"/>
+
+  </xacro:macro>
+</robot>
