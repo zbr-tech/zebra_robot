@@ -3,6 +3,7 @@ import rospy
 from quadruped_ctrl.hardware_bridge.myhardware_bridge import MyHardwareBridge
 from zebra_msgs.msg import ZebraJointControl
 from sensor_msgs.msg import JointState
+from trajectory_msgs.msg import JointTrajectoryPoint
 import os
 import math
 import time
@@ -10,6 +11,7 @@ import time
 class trajectory_controller:
     def __init__(self):
         rospy.init_node("trajectory_controller")
+        rospy.Subscriber("joint_target_trajectory", JointTrajectoryPoint, self.msgCallback)
         self._joint_control_publisher = rospy.Publisher('joint_control', ZebraJointControl, queue_size=100)
         self._joint_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=100)
 
@@ -43,7 +45,16 @@ class trajectory_controller:
         self._hardware.enable_all_joints()
         rospy.Timer(rospy.Duration(1.0 / communication_freq), self.controlCallback)
         rospy.spin()
-        
+
+    def msgCallback(self,data):
+        print("received")
+        self._receive_command_flag = True
+        # Update params
+        self._target_position = data.positions[0]
+        self._velocity_max = data.velocities[0]
+        self._acceleration = data.accelerations[0]
+        self._joint_control.kp = [5.0] * 12 # Set kp and kd after sending command to joints
+        self._joint_control.kd = [0.2] * 12
 
     def controlCallback(self, event):
         # Communicate with joints
@@ -57,18 +68,12 @@ class trajectory_controller:
         self._joint_state_publisher.publish(self._joint_state)
         self._joint_control_publisher.publish(self._joint_control)
 
-        # Receive command from topic
+
+        # Initialize params
         if self._receive_command_flag is True:
-            # Update params
-            self._acceleration = 5.0 # rad / sec^2
-            self._velocity_max = 5.0 # rad / sec
-            self._target_position = math.pi * -2.0 # rad
-            self._joint_control.kp = [5.0] * 12 # Set kp and kd after sending command to joints
-            self._joint_control.kd = [0.2] * 12
-            # Initialize params
+            self._receive_command_flag = False
             self._initial_position = leg[4]
             self._initial_time = time.time()
-            self._receive_command_flag = False
 
         # Local params
         target_position_diff = self._target_position - self._initial_position
