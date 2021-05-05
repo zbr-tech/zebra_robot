@@ -58,7 +58,7 @@ class joint_controller:
                 self._velocity_max[i] = data.velocities[i]
                 self._acceleration[i] = data.accelerations[i]
                 self._joint_control.kp[i] = 20.0  # set kp and kd after sending command to joints
-                self._joint_control.kd[i] = 0.2 
+                self._joint_control.kd[i] = 0.2
             else:
                 rospy.logwarn("Joint "+ str(i+1) + " received command but ignored")
 
@@ -83,7 +83,8 @@ class joint_controller:
                 self._initial_time[i] = time.time()
             else:   # check if joint follows the trajectory
                 if abs(self._joint_control.position[i] - leg[i]) > 0.1:
-                    rospy.logwarn("Joint "+ str(i+1) + " is not following the trajectory")
+                    if i is 4:
+                        rospy.logwarn("Joint "+ str(i+1) + " is not following the trajectory")
 
             # local params
             position_diff = self._position[i] - self._initial_position[i]
@@ -96,7 +97,7 @@ class joint_controller:
 
             # Check if the maximum velocity can be reached or not
             if pow(self._velocity_max[i],2) > self._acceleration[i] * position_diff:
-                time_mid = math.sqrt(position_diff / self._acceleration[i])
+                time_mid = math.sqrt(abs(position_diff / self._acceleration[i]))
                 time_end = time_mid * 2
             else :
                 time_mid = self._velocity_max[i] / self._acceleration[i]
