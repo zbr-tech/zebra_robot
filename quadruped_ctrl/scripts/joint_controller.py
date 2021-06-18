@@ -10,7 +10,7 @@ import time
 
 class joint_controller:
     def __init__(self):
-        self.MOTOR_NUM = 12 # number of joints
+        self.MOTOR_NUM = 1 # number of joints
         rospy.init_node("joint_controller")
         rospy.Subscriber("joint_trajectory_point", JointTrajectoryPoint, self.msgCallback)
         self._joint_control_publisher = rospy.Publisher('joint_control', ZebraJointControl, queue_size=100)
@@ -57,8 +57,8 @@ class joint_controller:
                 self._position[i] = data.positions[i]
                 self._velocity_max[i] = data.velocities[i]
                 self._acceleration[i] = data.accelerations[i]
-                self._joint_control.kp[i] = 20.0  # set kp and kd after sending command to joints
-                self._joint_control.kd[i] = 0.2
+                self._joint_control.kp[i] = 10.0  # set kp and kd after sending command to joints
+                self._joint_control.kd[i] = 0.1
             else:
                 rospy.logwarn("Joint "+ str(i+1) + " received command but ignored")
 
@@ -75,46 +75,49 @@ class joint_controller:
         self._joint_control_publisher.publish(self._joint_control)
 
         for i in range(self.MOTOR_NUM):
-            # initialize params
-            if self._has_received[i] is True:   # when received command from topic
+            # update target position when received command from topic
+            if self._has_received[i] is True:   
                 self._has_received[i] = False
                 self._has_arrived[i] = False
                 self._initial_position[i] = leg[i]
                 self._initial_time[i] = time.time()
-            else:   # check if joint follows the trajectory
-                if abs(self._joint_control.position[i] - leg[i]) > 0.1:
-                    if i is 4:
-                        rospy.logwarn("Joint "+ str(i+1) + " is not following the trajectory")
-
-            # local params
-            position_diff = self._position[i] - self._initial_position[i]
-            time_diff = time.time() - self._initial_time[i]
             
-            # check if target position is negative or positive
-            if position_diff < 0:
-                self._acceleration[i] = abs(self._acceleration[i]) * -1.0
-                self._velocity_max[i] = abs(self._velocity_max[i]) * -1.0
+            # calculte position and velocity when joint has not reached target position
+            if self._has_arrived[i] is False:
 
-            # Check if the maximum velocity can be reached or not
-            if pow(self._velocity_max[i],2) > self._acceleration[i] * position_diff:
-                time_mid = math.sqrt(abs(position_diff / self._acceleration[i]))
-                time_end = time_mid * 2
-            else :
-                time_mid = self._velocity_max[i] / self._acceleration[i]
-                time_end = time_mid + position_diff / self._velocity_max[i]
+                # check if joint follows the trajectory    
+                if abs(self._joint_control.position[i] - leg[i]) > 0.1: 
+                    rospy.logwarn("Joint "+ str(i+1) + " is not following the trajectory")
 
-            # Calculate velocity and posiion
-            if (0 <= time_diff) & (time_diff <= time_mid):    # self._acceleration phase
-                self._joint_control.velocity[i] = self._acceleration[i] * time_diff
-                self._joint_control.position[i] = 1 / 2.0 * self._acceleration[i] * pow(time_diff , 2)  + self._initial_position[i]
-            elif (time_mid < time_diff) & (time_diff <= time_end - time_mid): # Constant Velocity phase
-                self._joint_control.velocity[i] = self._velocity_max[i]
-                self._joint_control.position[i] = self._velocity_max[i] * (time_diff - time_mid / 2)  + self._initial_position[i]
-            elif (time_end - time_mid < time_diff) & (time_diff <= time_end): # Deacceleration phase
-                self._joint_control.velocity[i] = self._acceleration[i] * (time_end - time_diff)
-                self._joint_control.position[i] = position_diff - self._acceleration[i] / 2.0 * pow((time_end - time_diff),2)  + self._initial_position[i]
-            else:   # Reached target
-                self._has_arrived[i] = True
+                # local params
+                position_diff = self._position[i] - self._initial_position[i]
+                time_diff = time.time() - self._initial_time[i]
+                
+                # check if target position is negative or positive
+                if position_diff < 0:
+                    self._acceleration[i] = abs(self._acceleration[i]) * -1.0
+                    self._velocity_max[i] = abs(self._velocity_max[i]) * -1.0
+
+                # Check if the maximum velocity can be reached or not
+                if pow(self._velocity_max[i],2) > self._acceleration[i] * position_diff:
+                    time_mid = math.sqrt(abs(position_diff / self._acceleration[i]))
+                    time_end = time_mid * 2
+                else :
+                    time_mid = self._velocity_max[i] / self._acceleration[i]
+                    time_end = time_mid + position_diff / self._velocity_max[i]
+
+                # Calculate velocity and posiion
+                if (0 <= time_diff) & (time_diff <= time_mid):    # self._acceleration phase
+                    self._joint_control.velocity[i] = self._acceleration[i] * time_diff
+                    self._joint_control.position[i] = 1 / 2.0 * self._acceleration[i] * pow(time_diff , 2)  + self._initial_position[i]
+                elif (time_mid < time_diff) & (time_diff <= time_end - time_mid): # Constant Velocity phase
+                    self._joint_control.velocity[i] = self._velocity_max[i]
+                    self._joint_control.position[i] = self._velocity_max[i] * (time_diff - time_mid / 2)  + self._initial_position[i]
+                elif (time_end - time_mid < time_diff) & (time_diff <= time_end): # Deacceleration phase
+                    self._joint_control.velocity[i] = self._acceleration[i] * (time_end - time_diff)
+                    self._joint_control.position[i] = position_diff - self._acceleration[i] / 2.0 * pow((time_end - time_diff),2)  + self._initial_position[i]
+                else:   # Reached target
+                    self._has_arrived[i] = True
 
 if __name__ == "__main__":
     joint_controller()

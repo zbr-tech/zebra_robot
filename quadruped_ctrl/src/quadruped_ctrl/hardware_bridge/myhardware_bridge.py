@@ -8,8 +8,8 @@ from quadruped_ctrl.hardware_bridge.myhardware_base import MyHardwareBase
 # [TODO] this is leg 1 mode. should be change to 4 leg mode
 class MyHardwareBridge(MyHardwareBase):
     def __init__(self, communication_freq, ports, interface):
-        self.LEGPERMODULE = 12  # [TODO]
-        self.MOTOR_NUM = 12
+        self.LEGPERMODULE = 1  # [TODO]
+        self.MOTOR_NUM = 1
         self.GR = 6
         self._leg_data = [0] * 3 * self.MOTOR_NUM
         self._imu_data = [0] * 10
@@ -27,7 +27,7 @@ class MyHardwareBridge(MyHardwareBase):
                     rospy.logerr("Port "+ port + " not found")
 
     def communicate(self, joint_control):
-        for i in range(12):
+        for i in range(self.LEGPERMODULE):
             id = i + 1
             p_des = joint_control.position[i] / self.GR  * self.GR * -1.0 # really?
             v_des = joint_control.velocity[i] / self.GR  * self.GR * -1.0 # really?
