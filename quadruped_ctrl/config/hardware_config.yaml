@@ -1,0 +1,21 @@
+joint1:
+  id: 1
+  name: front_right_leg/joint1
+  position:
+    max: 1.57079632679
+    min: -1.57079632679
+    init: 0.0
+    error: 0.1
+  velocity:
+    max: 10.0
+    default: 5.0
+  acceleration: 
+    max: 10.0
+    default: 5.0
+  current: 10.0
+  kp:
+    max: 30.0
+    default: 10.0
+  kd: 
+    max: 1.0
+    default: 0.1
