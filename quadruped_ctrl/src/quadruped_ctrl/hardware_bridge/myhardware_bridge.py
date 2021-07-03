@@ -29,11 +29,11 @@ class MyHardwareBridge(MyHardwareBase):
     def communicate(self, joint_control):
         for i in range(self.LEGPERMODULE):
             id = i + 1
-            p_des = joint_control.position[i] / self.GR  * self.GR * -1.0 # really?
-            v_des = joint_control.velocity[i] / self.GR  * self.GR * -1.0 # really?
+            p_des = joint_control.position[i] * -1.0 # really?
+            v_des = joint_control.velocity[i] * -1.0 # really?
             kp = joint_control.kp[i]
             kd = joint_control.kd[i]
-            i_ff = joint_control.effort[i] / self.GR * self.GR * -1.0 # really?
+            i_ff = joint_control.effort[i] * -1.0 # really?
 
             module_id = i // self.LEGPERMODULE
             self._motor_modules[module_id].send_command(id, p_des, v_des, kp, kd, i_ff)
@@ -42,8 +42,8 @@ class MyHardwareBridge(MyHardwareBase):
                 id, posi, vel,current= ret
                 i = id - 1
                 if i < self.MOTOR_NUM:
-                    self._leg_data[i] = posi * self.GR  / self.GR * -1.0 # really?
-                    self._leg_data[i + self.MOTOR_NUM * 1] = vel * self.GR  / self.GR * -1.0 # really?
+                    self._leg_data[i] = posi * -1.0 # really?
+                    self._leg_data[i + self.MOTOR_NUM * 1] = vel * -1.0 # really?
                     self._leg_data[i + self.MOTOR_NUM * 2] = current * -1.0 # really?
             else:
                 #rospy.logerr("Joint " + str(i) + " not connected")
@@ -66,7 +66,7 @@ class MyHardwareBridge(MyHardwareBase):
         for i in range(self.MOTOR_NUM):
             module_id = i // self.LEGPERMODULE
             self._motor_modules[module_id].disable_motor(i + 1)
-        rospy.loginfo("Disable all joints")
+        rospy.loginfo_once("Disable all joints")
 
     def get_data(self):
         return self._imu_data, self._leg_data

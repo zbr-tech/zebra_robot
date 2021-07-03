@@ -13,8 +13,8 @@ class joint_controller:
     def __init__(self):
         self.MOTOR_NUM = 1 # number of joints
         rospy.init_node("joint_controller")
-        rospy.Subscriber("set_servo_on", Bool, self.servoOnCallback)
-        rospy.Subscriber("set_joint_angle", ZebraJointControl, self.msgCallback)
+        #rospy.Subscriber("set_servo_on", Bool, self.servoOnCallback)
+        #rospy.Subscriber("set_joint_angle", ZebraJointControl, self.msgCallback)
         self._joint_control_publisher = rospy.Publisher('joint_control', ZebraJointControl, queue_size=100)
         self._joint_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=100)
 
@@ -37,14 +37,15 @@ class joint_controller:
             joint_state.name[i] = rosparam.get_param("joint"+str(i+1)+"/name")
         self._joint_state = joint_state
 
-        self._has_received = [False] * self.MOTOR_NUM
         self._has_arrived = [True] * self.MOTOR_NUM
         self._acceleration = [0.1] * self.MOTOR_NUM    # avoid zero division
         self._velocity_max = [0.1] * self.MOTOR_NUM    # avoid zero division
         self._position = [0] * self.MOTOR_NUM
+        self._position_old = [0] * self.MOTOR_NUM
         self._initial_position = [0] * self.MOTOR_NUM
         self._initial_time = [0] * self.MOTOR_NUM
 
+        self._count = 0
 
         communication_freq = 500
         self._hardware = MyHardwareBridge(communication_freq, ["can0"], "can")
@@ -52,27 +53,7 @@ class joint_controller:
         rospy.Timer(rospy.Duration(1.0 / communication_freq), self.controlCallback)
         rospy.spin()
     
-    def servoOnCallback(self,data):
-        if data.data is True:
-            self._hardware.enable_all_joints()
-        else:
-            self._hardware.disable_all_joints()
-
-    def msgCallback(self,data):
-        # update params
-        for i in range(self.MOTOR_NUM):
-            if self._has_arrived[i] is True:
-                rospy.logdebug("Joint "+ str(i+1) + " received command. Updated target position")
-                self._has_received[i] = True
-                self._position[i] = data.position[i]
-                self._velocity_max[i] = data.velocity[i]
-                self._acceleration[i] = data.effort[i]
-                self._joint_control.kp[i] = data.kp[i]
-                self._joint_control.kd[i] = data.kd[i]
-            else:
-                rospy.logwarn("Joint "+ str(i+1) + " received command but ignored")
-
-    def controlCallback(self, event):
+    def communicate(self):
         # communicate with joints
         self._hardware.communicate(self._joint_control) # send data to joints
         imu, leg = self._hardware.get_data()            # receive data from joints
@@ -82,12 +63,14 @@ class joint_controller:
         self._joint_state.velocity = leg[self.MOTOR_NUM:self.MOTOR_NUM*2]
         self._joint_state.effort = leg[self.MOTOR_NUM*2:self.MOTOR_NUM*3]
         self._joint_state_publisher.publish(self._joint_state)
-        #self._joint_control_publisher.publish(self._joint_control)
+        self._joint_control_publisher.publish(self._joint_control)
+    
 
+    def safetyCheck(self):
         # joint state check for safety
         for i in range(self.MOTOR_NUM):
             error_flag = False
-            if abs(self._joint_state.position[i] - self._joint_control.position[i]) > rosparam.get_param("joint"+str(i+1)+"/position/max") or self._joint_state.position[i] < rosparam.get_param("joint"+str(i+1)+"/position/min"):
+            if self._has_arrived[i] is False and abs(self._joint_state.position[i] - self._joint_control.position[i]) > 0.1:
                 rospy.logerr_once("Joint "+ str(i+1) + " not following trajectory")
                 error_flag = True
             if self._joint_state.position[i] > rosparam.get_param("joint"+str(i+1)+"/position/max") or self._joint_state.position[i] < rosparam.get_param("joint"+str(i+1)+"/position/min"):
@@ -102,17 +85,22 @@ class joint_controller:
             if error_flag is True:
                 self._hardware.disable_all_joints()
                 self._has_arrived =  [True] * self.MOTOR_NUM
+    
 
-        # initialize params when target position is updated
+    def setJointAngle(self):
         for i in range(self.MOTOR_NUM):
-            if self._has_received[i] is True:   
-                self._has_received[i] = False
+            # initialize params when target position is updated
+            if self._position[i] is not self._position_old[i]:
+                self._position_old[i] = self._position[i]
                 self._has_arrived[i] = False
-                self._initial_position[i] = leg[i]
+                self._initial_position[i] = self._joint_state.position[i]
                 self._initial_time[i] = time.time()
+                self._velocity_max[i] = rosparam.get_param("joint"+str(i+1)+"/velocity/default")
+                self._acceleration[i] = rosparam.get_param("joint"+str(i+1)+"/acceleration/default")
+                self._joint_control.kp[i] = rosparam.get_param("joint"+str(i+1)+"/kp/default")
+                self._joint_control.kd[i] = rosparam.get_param("joint"+str(i+1)+"/kd/default")
 
-        # calculte position and velocity when joint has not reached target position yet
-        for i in range(self.MOTOR_NUM):
+            # calculte position and velocity when joint has not reached target position yet
             if self._has_arrived[i] is False:
                 # local params
                 position_diff = self._position[i] - self._initial_position[i]
@@ -143,6 +131,29 @@ class joint_controller:
                     self._joint_control.position[i] = position_diff - self._acceleration[i] / 2.0 * pow((time_end - time_from_start),2)  + self._initial_position[i]
                 else:   # Reached target
                     self._has_arrived[i] = True
+                    rospy.loginfo("Joint "+ str(i+1) + " has reached target position")
+                    #rospy.loginfo("Target: "+ str(self._position[i]) + "  Actual: "+ str(self._joint_state.position[i]) )
+
+    def calculateTorque(self):
+        for i in range(self.MOTOR_NUM):
+            mass = 0.35 # kg
+            length = 0.3#0.301 # kg
+            gravity = 9.80665
+            self._joint_control.effort[i] = mass * gravity * length * math.sin(self._joint_state.position[i])
+
+    def controlCallback(self, event):
+        if self._count is 0:
+            if self._has_arrived[0] is True:
+                self._position[0] = 90.0 / 180.0 * 3.14
+                self._count += 1
+        else:
+            if self._has_arrived[0] is True:
+                self._position[0] = self._position[0] * -1.0
+        self.communicate()
+        self.safetyCheck()
+        #self.setJointAngle()
+        self.calculateTorque()
+        
 
 if __name__ == "__main__":
     joint_controller()
